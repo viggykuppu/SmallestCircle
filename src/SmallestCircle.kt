@@ -118,6 +118,9 @@ class SmallestCircle{
         // the window or has pressed the ESCAPE key.
 
         createCircles()
+        val out = findSmallestCircle(circles)
+        println(out)
+        smallestCircle.add(out)
         val shader = Shader("src/shader.vs", "src/shader.fs")
 
         while (!glfwWindowShouldClose(window)) {
@@ -134,7 +137,6 @@ class SmallestCircle{
             shader.setColor(green)
             drawSmallestCircle()
 
-
             glfwSwapBuffers(window) // swap the color buffers
 
             // Poll for window events. The key callback above will only be
@@ -144,7 +146,7 @@ class SmallestCircle{
     }
 
     fun createCircles(){
-        val numCircles = 2
+        val numCircles = 3
         for(i in 1..numCircles){
             val random = Random()
 //            val x = 400 + 100*i
@@ -155,7 +157,6 @@ class SmallestCircle{
             val r = random.nextInt(200) + 50
             circles.add(Circle(x,y,r))
         }
-        smallestCircle.add(smallestTwoCircle(circles[0],circles[1]))
     }
 
     fun drawCircles(){
@@ -170,7 +171,21 @@ class SmallestCircle{
         }
     }
 
-    fun smallestTwoCircle(a: Circle, b: Circle) : Circle {
+    fun findSmallestCircle(circles: MutableList<Circle>): Circle{
+        if(circles.size == 0){
+            return Circle(500, 500, 100)
+        }
+        if(circles.size == 1){
+            return Circle(circles.first().x, circles.first().y, circles.first().r)
+        }
+        if(circles.size == 2){
+            return smallestTwoCircles(circles.get(0),circles.get(1))
+        }
+        println(3)
+        return ApolloniusSolver.Solve(circles.get(0),circles.get(1),circles.get(2))
+    }
+
+    fun smallestTwoCircles(a: Circle, b: Circle) : Circle {
         if(a.r > b.r){
             if(a.contains(b)){
                 return Circle(a.x, a.y, a.r)
@@ -207,11 +222,9 @@ class SmallestCircle{
             bry = Math.abs(brx*m)*signY
         }
 
-
         val cx = (a.x + arx + b.x + brx)/2
         val cy = (a.y + ary + b.y + bry)/2
         val cr = Math.sqrt(Math.pow((cx - (a.x + arx)), 2.0) + Math.pow(cy - (a.y + ary), 2.0))
-
 
         val ret = Circle(cx.toInt(), cy.toInt(), Math.ceil(cr).toInt())
         println(ret)
